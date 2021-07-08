@@ -7,6 +7,12 @@ import { Stack, IStackTokens} from '@fluentui/react/lib/Stack';
 import { DefaultButton } from '@fluentui/react/lib/Button';
 
 
+import InfoBar from '../Chat/MessageBar/MessageBar';
+import MessageDisplayer from '../Chat/MessageDisplayer/MessageDisplayer';
+import IconList from '../IconList/IconList';
+import Input from '../Chat/Input/Input';
+import Video from '../Video/Video'
+import Subtitles from '../Subtitles/Subtitles';
 // import VideoGrid from '../VideoGrid/VideoGrid'
 
 //import OnlinePeople from '../OnlinePeople/OnlinePeople';
@@ -278,7 +284,8 @@ const Call = ( {location}) => {
     <div>
     <Stack Vertical>
       <Stack horizontal>
-      <Stack vertical>        
+      <Stack vertical>
+        <IconList room={roomname} media={myStream} myPeer={myPeer} users={usersInRoom}  sub={sub} sendSub={sendTranscript} setShowSubtitle={setShowSubtitle} showSubtitle={showSubtitle} myStream={myStream}/> 
         <div className="videoGrid">
         {/* <Container> */}
         {/* <Stack horizontal> */}
@@ -292,15 +299,27 @@ const Call = ( {location}) => {
           overflow= 'auto'
           grow={true}
         >
+            {/* <StyledVideo id="myVideo" muted ref={userVideo} autoPlay playsInline /> */}
+            {peerList_duplicateLess.map((peer, id) => {
+                console.log("passed video peer",peer)
+                return (                    
+                    <Video key={peer.peerID} peer={peer.peer} videoId={peer.peerID} normalRef={myStream} users={usersInRoom} setmyPeer={setmyPeer}/>
+                );
+            })}
             </Stack>
         {/* </Container>   */}
         </div>
       </Stack>
       <div className="messageContainer">
         <div className="container">
+          <InfoBar />   
+          <MessageDisplayer messages={messageList} name={username} />   
+          <Input message={message} setMessage={setMessage} sendMessage={sendMessage}/>
         </div>
       </div>
       </Stack>
+      
+      {showSubtitle && (<Subtitles subUser={subUser} subText={subText}/>)}
       </Stack>
     
     </div>

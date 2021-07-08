@@ -6,6 +6,8 @@ import { TextField } from '@fluentui/react/lib/TextField';
 import { Separator } from '@fluentui/react/lib/Separator';
 import { GoogleOutlined } from '@ant-design/icons';
 import firebase from 'firebase/app';
+import axios from 'axios';
+import {useHistory} from 'react-router-dom';
 
 import { Link } from "react-router-dom";
 import { auth } from "../../firebase"
@@ -17,8 +19,33 @@ const stackTokens: IStackTokens = { childrenGap: 20 };
 const Join = () => {
 
   const [username, setUserName] = useState('');
-  const [roomname, setRoomName] = useState(''); //initialize as empty string
+  const [password, setPassword] = useState(''); //initialize as empty string
+  const history = useHistory();
+  const [error, setError] = useState('');
   
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("clicked submit");
+
+    const authObject = { 'Project-ID': process.env.REACT_APP_CHAT_ENGINE_ID, 'User-Name': username, 'User-Secret': password };
+
+    try {
+      await axios.get('https://api.chatengine.io/chats', { headers: authObject });
+
+      console.log(username, password);
+      localStorage.setItem('username', username);
+      localStorage.setItem('password', password);
+      console.log("creds set");
+
+      //window.location.reload();
+      history.push('./teams');
+      setError('');
+    } catch (err) {
+      setError('Oops, incorrect credentials.');
+    }
+  };
+  console.log(username, password);
+
   //console.log(window.location);
   
   return (    
@@ -41,20 +68,19 @@ const Join = () => {
               placeholder="Please enter user name here" 
               onChange={event => setUserName(event.target.value)}/>
             <TextField 
-              label="Room Name" 
-              placeholder="Please enter room name here" 
-              onChange={event => setRoomName(event.target.value)}/>
+              label="User Secret" 
+              placeholder="Please enter user secret here" 
+              onChange={event => setPassword(event.target.value)}/>
             <Stack.Item align="center" >
-              <Link to={`/call?name=${username}&room=${roomname}`}>
-                <DefaultButton 
+              <DefaultButton 
                 text="Join-Room" 
-                onClick={event => (!username || !roomname)? event.preventDefault() : null} //no response with no input
-                />  
-              </Link> 
+                onClick={event => handleSubmit(event)} //no response with no input
+                />
             </Stack.Item>
             <div className="login-button google"
             onClick={() => auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider())}><GoogleOutlined /> Sign in with Google </div>      
           </Stack>
+          <h1>{error}</h1>
         </div> 
       </Stack>
     </div>    

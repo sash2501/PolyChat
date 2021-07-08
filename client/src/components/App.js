@@ -6,6 +6,7 @@ import { AuthProvider } from "../contexts/AuthContext"
 
 import Teams from "./Teams/Teams";
 import Join from "./Join/Join";
+import Call from "./Session/Call/Call"
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Router>
         <AuthProvider>
           <Switch>
+            <Route path="/call" component={Call} />
             <Route path="/teams" component={Teams} />
             <Route path="/" component={Join} /> 
           </Switch>

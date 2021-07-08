@@ -13,7 +13,7 @@ const OptionsSettings = (props) => {
     })
     const { chat, room , name } = props
 
-    console.log("chat props",props, room, name)
+    //console.log("chat props",props, room, name)
 
     return (
         <div style={{ borderTop: '1px solid #f0f0f0' }}>

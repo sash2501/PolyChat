@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState} from 'react';
 import { useHistory } from 'react-router-dom';
 import { ChatEngine, ChatHeader } from 'react-chat-engine';
+import { Link } from "react-router-dom";
+import { Button } from 'react-chat-engine'
 
 import { auth } from '../../firebase';
 import axios from 'axios'
@@ -15,8 +17,10 @@ const Teams = () => {
   const [loading, setLoading] = useState(true);
   const [room, setRoom] = useState('');
   const [name, setName] = useState('');
+ //const name=""
+ //const room="Room2"
 
-  console.log("user", user);
+  //console.log("user", user);
     
   const handleLogout = async () => {
     await auth.signOut();
@@ -25,13 +29,27 @@ const Teams = () => {
   }
 
   useEffect(() => {
-    if(!user) {
+    if(!user && !localStorage.getItem('username')) {
       history.push('/');
 
       return;
     }
+    if(!user) {
+      //user.displayName = localStorage.getItem('username');
+      // user = {
+      //   displayName: {localStorage.getItem('username');}
+      // }
+      console.log("setting dname")
+      user = { 
+        'displayName': localStorage.getItem('username'), 
+        'email': localStorage.getItem('username'), 
+        'uid': localStorage.getItem('password') };
+    }
 
     setName(user.displayName);
+    //name=user.displayName;
+    localStorage.setItem('username', user.email);
+    localStorage.setItem('password', user.uid);
 
     const getFile = async (url) => {
       const response = await fetch(url);
@@ -73,8 +91,8 @@ const Teams = () => {
   }, [])
 
   if(!user || loading) return 'Loading.........'
-  console.log("room in team:", room);
-  console.log("name in team:", name);
+  //console.log("room in team:", room);
+  //console.log("name in team:", name);
   return (
     <div className="chats-page">
       <div className="nav-bar">
@@ -84,6 +102,14 @@ const Teams = () => {
         <div className="logout-tab" onClick={handleLogout}>
           Logout
         </div>
+        <Link to={`/call?name=${name}&room=${room}`}>
+          <Button 
+            value="Join-Room" 
+            theme='primary'
+            style={{ width: '100%', marginBottom: '12px' }}
+            onClick={event => (!name || !room)? event.preventDefault() : null} //no response with no input
+          />  
+        </Link>
       </div>
       <ChatEngine 
         height="calc(100vh - 66px)"
@@ -94,10 +120,11 @@ const Teams = () => {
           if(chat) {
             // console.log("chatheader",chat.title)
             setRoom(chat.title)
+            //room = chat.title
           }
           return <ChatHeader />
         }}
-        renderOptionsSettings={(props, chat) => <OptionsSettings {...props} chat={chat} name={name} room={room}/>}
+        renderOptionsSettings={(props, chat) => <OptionsSettings {...props} chat={chat} name={user.displayName} room={room}/>}
       />
     </div>
   );
